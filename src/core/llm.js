@@ -5,7 +5,7 @@ import { SHARED_AI_URL } from '../config.js';
 
 export const PROVIDERS = {
   quiet: { name: 'Quiet AI (shared)', note: 'Free — nothing to set up', models: ['shared'], shared: true },
-  groq: { name: 'Groq', note: 'Free tier, very fast', keyUrl: 'https://console.groq.com/keys', keyHint: 'gsk_…', models: ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b'], vision: 'meta-llama/llama-4-scout-17b-16e-instruct', whisper: 'whisper-large-v3-turbo' },
+  groq: { name: 'Groq', note: 'Free tier, very fast', keyUrl: 'https://console.groq.com/keys', keyHint: 'gsk_…', models: ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b'], vision: 'qwen/qwen3.8-27b', whisper: 'whisper-large-v3-turbo' },
   gemini: { name: 'Google Gemini', note: 'Free tier available', keyUrl: 'https://aistudio.google.com/apikey', keyHint: 'AIza…', models: ['gemini-2.5-flash', 'gemini-2.5-pro'], audio: true },
   openai: { name: 'OpenAI', note: 'Paid', keyUrl: 'https://platform.openai.com/api-keys', keyHint: 'sk-…', models: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'], whisper: 'whisper-1' },
   anthropic: { name: 'Anthropic Claude', note: 'Paid', keyUrl: 'https://console.anthropic.com/settings/keys', keyHint: 'sk-ant-…', models: ['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-5-5'] },
@@ -65,7 +65,7 @@ export async function llmJSON({ system, prompt, schema = null, images = [], maxT
   const useModel = images.length && provider === 'groq' ? PROVIDERS.groq.vision : model;
   const content = images.length ? [{ type: 'text', text: prompt }, ...images.map(i => ({ type: 'image_url', image_url: { url: `data:${i.mime};base64,${i.data}` } }))] : prompt;
   const body = { model: useModel, temperature: 0.2, messages: [{ role: 'system', content: sys }, { role: 'user', content }], response_format: { type: 'json_object' } };
-  if (provider === 'groq') { body.max_completion_tokens = maxTokens; if (/gpt-oss/.test(useModel)) body.reasoning_effort = 'low'; } else body.max_tokens = maxTokens;
+  if (provider === 'groq') { body.max_completion_tokens = maxTokens; if (/gpt-oss/.test(useModel)) body.reasoning_effort = 'low'; if (/qwen/.test(useModel)) body.reasoning_format = 'hidden'; } else body.max_tokens = maxTokens;
   const label = PROVIDERS[provider].name;
   try {
     const j = await jfetch(base + '/chat/completions', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + key }, body: JSON.stringify(body) }, label);

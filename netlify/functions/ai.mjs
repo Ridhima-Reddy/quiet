@@ -10,8 +10,8 @@ const ALLOWED = new Set([
   'http://127.0.0.1:47821', 'http://127.0.0.1:47822', 'http://127.0.0.1:47823', 'http://127.0.0.1:47824',
   'http://localhost:5173',
 ]);
-const MODELS = ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile'];
-const VISION = 'meta-llama/llama-4-scout-17b-16e-instruct';
+const MODELS = ['openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'qwen/qwen3.8-27b'];
+const VISION = ['qwen/qwen3.8-27b']; // reads photos of assignment sheets
 const hits = new Map(); // simple per-IP rate limit (per warm instance)
 const LIMIT = 40, WINDOW = 10 * 60e3;
 
@@ -47,13 +47,17 @@ export default async (req, context) => {
   if (!prompt) return json(400, { error: 'Empty request' }, origin);
 
   const content = images.length ? [{ type: 'text', text: prompt }, ...images.map(i => ({ type: 'image_url', image_url: { url: `data:${i.mime};base64,${i.data}` } }))] : prompt;
-  for (const model of images.length ? [VISION] : MODELS) {
-    const req2 = { model, temperature: 0.2, max_completion_tokens: maxTokens, response_format: { type: 'json_object' }, messages: [{ role: 'system', content: system }, { role: 'user', content }] };
+  const messages = [...(system ? [{ role: 'system', content: system }] : []), { role: 'user', content }];
+  const attempts = (images.length ? VISION : MODELS).flatMap(model => [{ model, jsonMode: true }, { model, jsonMode: false }]);
+  for (const { model, jsonMode } of attempts) {
+    const req2 = { model, temperature: 0.2, max_completion_tokens: maxTokens, messages };
+    if (jsonMode) req2.response_format = { type: 'json_object' };
     if (/gpt-oss/.test(model)) req2.reasoning_effort = 'low';
+    if (/qwen/.test(model)) req2.reasoning_format = 'hidden';
     let r;
     try { r = await fetch('https://api.groq.com/openai/v1/chat/completions', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + key }, body: JSON.stringify(req2) }); }
     catch { return json(502, { error: 'Couldn’t reach the AI provider' }, origin); }
-    if (r.status === 404 || r.status === 400) continue; // model retired or JSON mode unsupported: try the next one
+    if (r.status === 400 || r.status === 404) continue; // JSON mode refused → same model without it; model retired → next model
     const j = await r.json().catch(() => ({}));
     if (r.status === 401) return json(503, { error: 'Quiet AI’s key needs updating' }, origin);
     if (r.status === 429) return json(429, { error: 'Quiet AI is busy — try again in a minute' }, origin);
