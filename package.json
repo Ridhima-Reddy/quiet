@@ -1,0 +1,25 @@
+{
+  "name": "quiet",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Quiet: a calm AI companion for cognitive and emotional wellbeing (Chrome extension, desktop app, phone PWA).",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch",
+    "serve": "node tools/serve.mjs",
+    "test": "node --test \"tests/unit/*.test.mjs\"",
+    "e2e": "node tests/e2e/run.mjs",
+    "icons": "node tools/make-icons.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "fflate": "^0.8.3",
+    "pdfjs-dist": "^4.10.38",
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "puppeteer-core": "^24.43.1"
+  }
+}

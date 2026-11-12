@@ -1,0 +1,54 @@
+{
+  "name": "quiet-desktop",
+  "productName": "Quiet",
+  "version": "3.0.0",
+  "description": "Quiet desktop app: a calm planner with a small companion that lives on your screen.",
+  "main": "main.js",
+  "author": "Quiet",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux AppImage"
+  },
+  "build": {
+    "appId": "app.quiet.desktop",
+    "productName": "Quiet",
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "config.json",
+      "config.example.json",
+      "app/**"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "app/icons/icon-512.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "shortcutName": "Quiet"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "app/icons/icon-512.png"
+    },
+    "linux": {
+      "icon": "app/icons/icon-512.png",
+      "category": "Office"
+    }
+  },
+  "devDependencies": {
+    "electron": "^37.10.3",
+    "electron-builder": "^26.18.0"
+  }
+}

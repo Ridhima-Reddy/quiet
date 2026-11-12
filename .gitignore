@@ -1,0 +1,11 @@
+node_modules/
+dist/
+desktop/node_modules/
+desktop/out/
+keys/*.pem
+tests/e2e/shots/
+*.log
+desktop/config.json
+desktop/smoke-*.png
+src/static/extension-id.txt.bak
+desktop/app/
