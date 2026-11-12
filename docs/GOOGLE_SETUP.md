@@ -28,7 +28,7 @@ Google requires every app to have its own OAuth client. Do this once; everyone i
 **Clients → Create client → Web application**, name `Quiet Web`:
 
 - **Authorized JavaScript origins**
-  - the address where you host the phone app, e.g. `https://<your-github-username>.github.io`
+  - `https://quiet-calm-planner.netlify.app` ← the phone/web app
   - `http://localhost:5173` (for `npm run serve` testing)
 - **Authorized redirect URIs**
   - `https://ahdcidmacoljiikibjbmghjjdmbhpnmf.chromiumapp.org/` ← the Chrome extension (its ID is fixed by `src/static/extension-key.txt`; also printed by `npm run icons` and shown in Quiet → You → Google → Advanced)

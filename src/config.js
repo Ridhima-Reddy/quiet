@@ -10,4 +10,4 @@ export const SCOPES = [
 ].join(' ');
 
 // Where the phone/web app is hosted (used for links from the extension and desktop app).
-export const WEB_APP_URL = '';
+export const WEB_APP_URL = 'https://quiet-calm-planner.netlify.app/';

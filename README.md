@@ -20,7 +20,7 @@ node tests/e2e/extension.mjs   # loads the extension in Chrome and checks it
 
 - **Chrome extension:** `chrome://extensions` → Developer mode → **Load unpacked** → `dist/extension`.
 - **Desktop app:** `cd desktop && npm install && npm start`. Installer: `npm run dist` → `desktop/out/`.
-- **Phone:** host `dist/web` on any HTTPS static host (GitHub Pages, Netlify, Vercel, Firebase Hosting). Open the URL on your phone → **Add to Home Screen** (iPhone: Share menu; Android: ⋮ → Install app). For a quick local look: `npm run serve` → <http://localhost:5173>.
+- **Phone:** open **<https://quiet-calm-planner.netlify.app>** on your phone → **Add to Home Screen** (iPhone: Share menu; Android: ⋮ → Install app). Publish changes with `npm run deploy` (builds, then deploys `dist/web` to Netlify). For a quick local look: `npm run serve` → <http://localhost:5173>.
 - **Sync + Google Calendar:** one-time setup in [docs/GOOGLE_SETUP.md](docs/GOOGLE_SETUP.md). Until then everything works on each device on its own.
 - **AI (optional):** You → AI. Groq has a free tier; Gemini, OpenAI and Anthropic Claude also work. Without a key, a built-in offline sorter handles dates, times, exams, deadlines, worries and habits.
 

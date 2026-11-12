@@ -10,7 +10,8 @@
     "serve": "node tools/serve.mjs",
     "test": "node --test \"tests/unit/*.test.mjs\"",
     "e2e": "node tests/e2e/run.mjs",
-    "icons": "node tools/make-icons.mjs"
+    "icons": "node tools/make-icons.mjs",
+    "deploy": "node build.mjs && npx -y netlify-cli@27.17.0 deploy --prod --dir dist/web --site 12194b1b-04f2-4c5b-bd20-57fdc533c2d0"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",

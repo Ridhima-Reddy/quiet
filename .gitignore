@@ -9,3 +9,4 @@ desktop/config.json
 desktop/smoke-*.png
 src/static/extension-id.txt.bak
 desktop/app/
+.netlify/
