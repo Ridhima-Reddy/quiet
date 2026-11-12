@@ -100,7 +100,7 @@ async function tokenRequest(params) {
   const j = await r.json(); if (!r.ok) throw new Error(j.error_description || j.error || 'Google sign-in failed'); return j;
 }
 async function googleToken({ interactive, scopes, force }) {
-  if (!config.googleClientId) { if (interactive) throw new Error('Desktop Google sign-in is not set up — add googleClientId/googleClientSecret to desktop/config.json (see docs/GOOGLE_SETUP.md).'); return null; }
+  if (!config.googleClientId) { if (interactive) throw new Error('Desktop Google sign-in is not set up — add googleClientId/googleClientSecret to desktop/config.json (see Desktop › Quiet docs › GOOGLE_SETUP.md).'); return null; }
   const saved = readTokens();
   if (!force && saved?.access && saved.exp > Date.now() + 90e3) return { token: saved.access, exp: saved.exp };
   if (saved?.refresh) {

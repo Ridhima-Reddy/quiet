@@ -51,7 +51,7 @@ export async function getToken({ interactive = false, force = false } = {}) {
   const g = store.local.google;
   if (!force && g?.token && g.exp > Date.now() + 90e3) return g.token;
   if (!interactive && !g?.connected) return null;
-  if (!googleConfigured()) { if (interactive) throw new Error('Google sign-in is not set up yet — see docs/GOOGLE_SETUP.md'); return null; }
+  if (!googleConfigured()) { if (interactive) throw new Error('Google sign-in is not set up yet — see the Google setup guide (Quiet docs › GOOGLE_SETUP.md)'); return null; }
   if (inflight) return inflight;
   inflight = (async () => {
     const first = !g?.connected, hint = g?.email;

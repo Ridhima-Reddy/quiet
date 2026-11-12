@@ -123,7 +123,7 @@ function GoogleSection() {
           <button class="btn sm ghost" onClick={async () => { await disconnect(); q.toast('Disconnected. Your data stays on this device.'); }}>Disconnect</button>
         </div>
       ) : (
-        <div class="set-row"><Icon name="google" size={22} /><div class="grow"><div>Not connected</div><div>{googleConfigured() ? 'Your data stays on this device until you connect.' : 'Google sign-in needs a one-time setup (see docs/GOOGLE_SETUP.md), then paste the client ID under Advanced.'}</div></div>
+        <div class="set-row"><Icon name="google" size={22} /><div class="grow"><div>Not connected</div><div>{googleConfigured() ? 'Your data stays on this device until you connect.' : 'Google sign-in needs a one-time setup (see the Google setup guide in Quiet docs), then paste the client ID under Advanced.'}</div></div>
           <button class="btn primary" disabled={busy || !googleConfigured()} onClick={connect}>{busy ? 'Connecting…' : 'Connect Google'}</button></div>
       )}
       <div class="card pad" style="margin:12px 0">
