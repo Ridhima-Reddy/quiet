@@ -391,3 +391,17 @@ table.eval { width: 100%; border-collapse: collapse; font-size: 13px; } table.ev
   .check { width: 24px; height: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* Hosting badge (Netlify free plan) sits bottom-right: reserve a strip so it never covers a control. */
+:root { --badge: 0px; }
+html.has-badge { --badge: 64px; }
+html.has-badge .dock { bottom: calc(18px + var(--badge)); }
+html.has-badge .sheet.drawer .sf { padding-bottom: calc(12px + var(--badge)); }
+@media (max-width: 760px) {
+  html.has-badge .tabbar { padding-bottom: calc(6px + env(safe-area-inset-bottom) + var(--badge)); }
+  html.has-badge .main { padding-bottom: calc(96px + env(safe-area-inset-bottom) + var(--badge)); }
+  html.has-badge .sheet.drawer, html.has-badge .sheet.modal { padding-bottom: calc(env(safe-area-inset-bottom) + var(--badge)); }
+  html.has-badge .sheet.drawer .sf { padding-bottom: 12px; }
+  html.has-badge .toasts { bottom: calc(86px + env(safe-area-inset-bottom) + var(--badge)); }
+  html.has-badge .focus { padding-bottom: calc(24px + var(--badge)); }
+}
