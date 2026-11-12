@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { useQ } from '../ctx.jsx';
 import { Icon } from '../icons.jsx';
 import { Switch, Seg, Mascot, goalColor } from '../components.jsx';
@@ -42,7 +42,7 @@ export function You() {
       <section class="set-sec">
         <h2>What matters to you</h2><p>Quiet tags tasks with these, favours them when you have room, and shows where your week actually went.</p>
         <div class="row wrap" style="margin-bottom:10px">{goals.map(x => <span class="goal-chip" key={x.id}><i class="dot" style={{ background: goalColor(state, x.id) }} />{x.name}<button aria-label={'Remove ' + x.name} onClick={() => store.remove('goals', x.id)}><Icon name="x" size={14} /></button></span>)}</div>
-        <div class="row"><input class="input" value={g} onInput={e => setG(e.currentTarget.value)} onKeyDown={e => e.key === 'Enter' && addGoal(g)} placeholder="e.g. become a better researcher" /><button class="btn" onClick={() => addGoal(g)}>Add</button></div>
+        <div class="row"><input class="input" value={g} onInput={e => setG(e.currentTarget.value)} onKeyDown={e => e.key === 'Enter' && addGoal(e.currentTarget.value)} placeholder="e.g. become a better researcher" /><button class="btn" onClick={e => addGoal(e.currentTarget.previousElementSibling?.value ?? g)}>Add</button></div>
         <div class="row wrap" style="margin-top:8px">{GOAL_IDEAS.filter(x => !goals.some(y => y.name === x)).slice(0, 5).map(x => <button key={x} class="btn sm ghost" onClick={() => addGoal(x)}><Icon name="plus" size={13} />{x}</button>)}</div>
       </section>
 
@@ -53,7 +53,7 @@ export function You() {
             <select class="select" style="width:auto" value={x.perWeek} onChange={e => store.put('habits', { ...x, perWeek: +e.currentTarget.value })}>{[1, 2, 3, 4, 5, 6, 7].map(n => <option key={n} value={n}>{n === 7 ? 'every day' : `${n}× a week`}</option>)}</select>
             <button class="btn ghost icon sm" aria-label="Remove habit" onClick={() => store.remove('habits', x.id)}><Icon name="trash" size={15} /></button></div>
         ))}
-        <div class="row" style="margin-top:10px"><input class="input" value={h} onInput={e => setH(e.currentTarget.value)} onKeyDown={e => e.key === 'Enter' && addHabit(h)} placeholder="New habit" /><button class="btn" onClick={() => addHabit(h)}>Add</button></div>
+        <div class="row" style="margin-top:10px"><input class="input" value={h} onInput={e => setH(e.currentTarget.value)} onKeyDown={e => e.key === 'Enter' && addHabit(e.currentTarget.value)} placeholder="New habit" /><button class="btn" onClick={e => addHabit(e.currentTarget.previousElementSibling?.value ?? h)}>Add</button></div>
         <div class="row wrap" style="margin-top:8px">{HABIT_IDEAS.filter(([n]) => !habits.some(y => y.name === n)).map(([n, k]) => <button key={n} class="btn sm ghost" onClick={() => addHabit(n, k)}><Icon name="plus" size={13} />{n}</button>)}</div>
       </section>
 
@@ -105,10 +105,12 @@ function GoogleSection() {
   const [busy, setBusy] = useState(false);
   const [cid, setCid] = useState(local.googleClientId || '');
   const set = (k, v) => store.setPref(k, v);
+  const attempt = useRef(0);
   const connect = async () => {
+    const id = ++attempt.current; // a newer click supersedes an older, stuck attempt
     setBusy(true);
-    try { const t = await getToken({ interactive: true }); if (t) { q.toast('Connected. Syncing…'); await syncNow(); q.toast('All synced.'); } }
-    catch (e) { q.toast(e.message); } finally { setBusy(false); }
+    try { const t = await getToken({ interactive: true }); if (t && id === attempt.current) { q.toast('Connected. Syncing…'); await syncNow(); q.toast('All synced.'); } }
+    catch (e) { if (id === attempt.current) q.toast(e.message); } finally { if (id === attempt.current) setBusy(false); }
   };
   const cals = state.gcal?.calendars || [];
   return (
@@ -123,8 +125,8 @@ function GoogleSection() {
           <button class="btn sm ghost" onClick={async () => { await disconnect(); q.toast('Disconnected. Your data stays on this device.'); }}>Disconnect</button>
         </div>
       ) : (
-        <div class="set-row"><Icon name="google" size={22} /><div class="grow"><div>Not connected</div><div>{googleConfigured() ? 'Your data stays on this device until you connect.' : 'Google sign-in needs a one-time setup (see the Google setup guide in Quiet docs), then paste the client ID under Advanced.'}</div></div>
-          <button class="btn primary" disabled={busy || !googleConfigured()} onClick={connect}>{busy ? 'Connecting…' : 'Connect Google'}</button></div>
+        <div class="set-row"><Icon name="google" size={22} /><div class="grow"><div>Not connected</div><div>{!googleConfigured() ? 'Google sign-in needs a one-time setup (see the Google setup guide in Quiet docs), then paste the client ID under Advanced.' : busy ? 'Finish signing in in the browser window that opened. Wrong account or closed it? Click Start over.' : 'Your data stays on this device until you connect.'}</div></div>
+          <button class="btn primary" disabled={!googleConfigured()} onClick={connect}>{busy ? 'Start over' : 'Connect Google'}</button></div>
       )}
       <div class="card pad" style="margin:12px 0">
         <div class="small"><b>What goes to Google Calendar</b></div>
@@ -151,10 +153,11 @@ function AISection() {
   const prov = PROVIDERS[prefs.aiProvider];
   return (
     <section class="set-sec">
-      <h2>AI</h2><p>Quiet works without AI (a built-in sorter handles dates, exams and deadlines). With a key it understands messy dumps, estimates effort better, reads your files and writes your weekly reflection.</p>
-      <div class="set-row"><div class="grow"><div>Provider</div>{prov && <div>{prov.note} · <a href={prov.keyUrl} target="_blank" rel="noreferrer">get a key</a></div>}</div>
-        <select class="select" style="width:auto" value={prefs.aiProvider} onChange={e => store.setPrefs({ aiProvider: e.currentTarget.value, aiModel: '' })}><option value="none">No AI</option>{Object.entries(PROVIDERS).map(([k, v]) => <option key={k} value={k}>{v.name}</option>)}</select></div>
-      {prov && <>
+      <h2>AI</h2><p>AI understands messy dumps, estimates effort, reads your files and writes your weekly reflection. Quiet AI is shared and free — nothing to set up. You can use your own key instead, or turn AI off (a built-in sorter still handles dates, exams and deadlines).</p>
+      <div class="set-row"><div class="grow"><div>Provider</div>{prov && (prov.shared ? <div>{prov.note}</div> : <div>{prov.note} · <a href={prov.keyUrl} target="_blank" rel="noreferrer">get a key</a>{!(prefs.aiKey || '').trim() ? ' · until you add a key, Quiet AI is used' : ''}</div>)}</div>
+        <select class="select" style="width:auto" value={prefs.aiProvider} onChange={e => store.setPrefs({ aiProvider: e.currentTarget.value, aiModel: '' })}>{Object.entries(PROVIDERS).map(([k, v]) => <option key={k} value={k}>{v.shared ? v.name : `${v.name} (your own key)`}</option>)}<option value="none">No AI</option></select></div>
+      {prov?.shared && <div class="set-row"><div class="grow"><div>Test the connection</div><div>{status}</div></div><button class="btn sm" onClick={async () => { setStatus('Checking…'); try { await testAI({ provider: 'quiet', key: 'shared', model: 'shared' }); setStatus('Connected ✓'); } catch (e) { setStatus(e.message); } }}>Test</button></div>}
+      {prov && !prov.shared && <>
         <div class="set-row"><div class="grow"><div>API key</div><div>Synced privately to your devices via your Google Drive app folder.</div></div><input class="input" type="password" style="max-width:260px" value={key} placeholder={prov.keyHint} onInput={e => setKey(e.currentTarget.value)} onChange={e => store.setPref('aiKey', e.currentTarget.value.trim())} /></div>
         <div class="set-row"><div class="grow"><div>Model</div></div><input class="input" list="models" style="max-width:260px" value={prefs.aiModel || prov.models[0]} onChange={e => store.setPref('aiModel', e.currentTarget.value.trim())} /><datalist id="models">{prov.models.map(m => <option key={m} value={m} />)}</datalist></div>
         <div class="set-row"><div class="grow"><div>Test the connection</div><div>{status}</div></div><button class="btn sm" onClick={async () => { setStatus('Checking…'); try { await store.setPref('aiKey', key.trim()); await testAI({ provider: prefs.aiProvider, key: key.trim(), model: prefs.aiModel || prov.models[0] }); setStatus('Connected ✓'); } catch (e) { setStatus(e.message); } }}>Test</button></div>

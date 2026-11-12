@@ -30,7 +30,7 @@ export function Dump({ initial = '' }) {
   useEffect(() => { const t = setTimeout(() => store.setLocal(l => ({ ui: { ...(l.ui || {}), dumpDraft: text } })), 400); return () => clearTimeout(t); }, [text]);
 
   const go = async () => {
-    const dump = text.trim(); if (!dump && !files.length) return;
+    const dump = (ta.current ? ta.current.value : text).trim(); if (!dump && !files.length) return; // read the box itself: a word still being composed by the keyboard counts too
     setPhase('think');
     const goals = Object.values(state.goals).filter(g => g && !g.del);
     const existing = Object.values(state.items).filter(i => i && !i.del && i.status !== 'done');

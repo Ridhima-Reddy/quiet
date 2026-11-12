@@ -19,7 +19,7 @@ hr{border:0;border-top:1px solid var(--line);margin:40px 0 16px}
 <h1>Privacy policy</h1>
 <p>Last updated 12 November 2026</p>
 
-<p>Quiet is a student prototype: a calm planner that turns a “brain dump” into a realistic plan and reminds you to look after yourself. It is built so that <strong>your data stays with you</strong>. There is no Quiet server and no Quiet database.</p>
+<p>Quiet is a student prototype: a calm planner that turns a “brain dump” into a realistic plan and reminds you to look after yourself. It is built so that <strong>your data stays with you</strong>. There is no Quiet database and no Quiet account; the only server part is a small relay for the shared AI, described below, which keeps nothing.</p>
 
 <h2>What Quiet stores, and where</h2>
 <ul>
@@ -36,8 +36,13 @@ hr{border:0;border-top:1px solid var(--line);margin:40px 0 16px}
 </ul>
 <p>This information is used only to provide these features to you. Quiet’s use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. Your Google data is never sold, never used for advertising, never used to train AI models, and never sent to the people who made Quiet.</p>
 
-<h2>AI features (optional)</h2>
-<p>Quiet works without AI. If you add your own API key for an AI provider (Groq, Google Gemini, OpenAI or Anthropic), the text you type into the brain dump — and any file or photo you attach to it — is sent <strong>directly from your device to that provider</strong> to sort it into tasks or write your weekly reflection. That provider’s own privacy terms apply. Your key is stored on your devices and, if you connect Google, in your Drive sync file.</p>
+<h2>AI features</h2>
+<p>When you use the brain dump, “Break it into steps” or the weekly reflection, the text involved — and any file or photo you attach to a brain dump — is sent to an AI model to be sorted or summarised:</p>
+<ul>
+<li><strong>Quiet AI (the default, shared):</strong> the request passes through a small Quiet server function on Netlify to <a href="https://groq.com/privacy-policy/">Groq</a>, which runs the AI model. The function only forwards the request and returns the answer; it does not store or log what you send. Groq’s own privacy terms apply.</li>
+<li><strong>Your own key (optional):</strong> if you add a key for Groq, Google Gemini, OpenAI or Anthropic, requests go <strong>directly from your device to that provider</strong> instead, under its terms. Your key is stored on your devices and, if you connect Google, in your Drive sync file.</li>
+<li><strong>No AI:</strong> you can turn AI off in <strong>You → AI</strong>; a built-in sorter then runs entirely on your device.</li>
+</ul>
 
 <h2>No tracking</h2>
 <p>Quiet has no analytics, no ads, no cookies for tracking and no third-party trackers. The app is hosted on Netlify, which may keep standard server logs (such as IP addresses) when the page is loaded.</p>

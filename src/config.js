@@ -11,3 +11,6 @@ export const SCOPES = [
 
 // Where the phone/web app is hosted (used for links from the extension and desktop app).
 export const WEB_APP_URL = 'https://quiet-calm-planner.netlify.app/';
+
+// Shared AI for everyone (a Netlify function that holds the key). Set to '' to require personal keys.
+export const SHARED_AI_URL = 'https://quiet-calm-planner.netlify.app/api/ai';

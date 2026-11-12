@@ -27,7 +27,7 @@ export const DEFAULT_PREFS = {
   gcalBlockFocus: false,    // also block focus time for big tasks (off: keeps your calendar clean)
   gcalBedtimeEvent: false,  // a daily wind-down event so your phone reminds you
   // AI
-  aiProvider: 'groq',       // groq | gemini | openai | anthropic | none
+  aiProvider: 'quiet',      // quiet (shared, no key needed) | groq | gemini | openai | anthropic | none
   aiModel: '',
   studyMode: false,
   participant: '',

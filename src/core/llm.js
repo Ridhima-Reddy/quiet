@@ -1,17 +1,23 @@
 // Provider-agnostic LLM client. Your key stays in your own storage (and your own Google Drive
 // app folder when sync is on); requests go straight from your device to the provider.
 import { store } from './store.js';
+import { SHARED_AI_URL } from '../config.js';
 
 export const PROVIDERS = {
+  quiet: { name: 'Quiet AI (shared)', note: 'Free — nothing to set up', models: ['shared'], shared: true },
   groq: { name: 'Groq', note: 'Free tier, very fast', keyUrl: 'https://console.groq.com/keys', keyHint: 'gsk_…', models: ['openai/gpt-oss-120b', 'llama-3.3-70b-versatile', 'openai/gpt-oss-20b'], vision: 'meta-llama/llama-4-scout-17b-16e-instruct', whisper: 'whisper-large-v3-turbo' },
   gemini: { name: 'Google Gemini', note: 'Free tier available', keyUrl: 'https://aistudio.google.com/apikey', keyHint: 'AIza…', models: ['gemini-2.5-flash', 'gemini-2.5-pro'], audio: true },
   openai: { name: 'OpenAI', note: 'Paid', keyUrl: 'https://platform.openai.com/api-keys', keyHint: 'sk-…', models: ['gpt-4.1-mini', 'gpt-4.1', 'gpt-4o-mini'], whisper: 'whisper-1' },
   anthropic: { name: 'Anthropic Claude', note: 'Paid', keyUrl: 'https://console.anthropic.com/settings/keys', keyHint: 'sk-ant-…', models: ['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-5-5'] },
 };
 
+/** Your own key if you added one; otherwise Quiet's shared AI (unless AI is turned off). */
 export function aiConfig() {
-  const p = store.prefs(), prov = PROVIDERS[p.aiProvider] ? p.aiProvider : null;
-  return { provider: prov, key: (p.aiKey || '').trim(), model: p.aiModel || (prov ? PROVIDERS[prov].models[0] : '') };
+  const p = store.prefs(), key = (p.aiKey || '').trim();
+  const prov = PROVIDERS[p.aiProvider] && !PROVIDERS[p.aiProvider].shared ? p.aiProvider : null;
+  if (prov && key) return { provider: prov, key, model: p.aiModel || PROVIDERS[prov].models[0] };
+  if (p.aiProvider !== 'none' && SHARED_AI_URL) return { provider: 'quiet', key: 'shared', model: 'shared' };
+  return { provider: null, key: '', model: '' };
 }
 export const aiReady = () => { const c = aiConfig(); return !!(c.provider && c.key); };
 
@@ -37,6 +43,14 @@ export async function llmJSON({ system, prompt, schema = null, images = [], maxT
   const { provider, key, model } = cfg;
   if (!provider || !key) throw new Error('No AI key yet');
   const sys = (system || 'You are a careful assistant.') + ' Reply with a single valid JSON object and nothing else.';
+  if (provider === 'quiet') {
+    let r;
+    try { r = await fetch(SHARED_AI_URL, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ system: sys, prompt, images, maxTokens }) }); }
+    catch { throw new Error('Can’t reach Quiet AI — are you online?'); }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || 'Quiet AI is unavailable right now');
+    return parseJSON(j.text);
+  }
   if (provider === 'anthropic') return parseJSON(await anthropicCall({ key, model, sys, prompt, images, schema, maxTokens }));
   if (provider === 'gemini') {
     const parts = [{ text: prompt }, ...images.map(i => ({ inline_data: { mime_type: i.mime, data: i.data } }))];

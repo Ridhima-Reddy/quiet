@@ -25,3 +25,7 @@
   [headers.values]
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Server function for the shared AI (the Groq key lives in Netlify env vars, never in the app)
+[functions]
+  directory = "netlify/functions"

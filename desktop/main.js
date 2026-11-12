@@ -99,6 +99,7 @@ async function tokenRequest(params) {
   const r = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ client_id: config.googleClientId, client_secret: config.googleClientSecret || '', ...params }) });
   const j = await r.json(); if (!r.ok) throw new Error(j.error_description || j.error || 'Google sign-in failed'); return j;
 }
+let pendingSignIn = null; // cancels the browser sign-in that's still waiting, if any
 async function googleToken({ interactive, scopes, force }) {
   if (!config.googleClientId) { if (interactive) throw new Error('Desktop Google sign-in is not set up — add googleClientId/googleClientSecret to desktop/config.json (see Desktop › Quiet docs › GOOGLE_SETUP.md).'); return null; }
   const saved = readTokens();
@@ -108,20 +109,24 @@ async function googleToken({ interactive, scopes, force }) {
     catch (e) { if (!interactive) return null; }
   }
   if (!interactive) return null;
+  // A new click on "Connect Google" always starts over: abandon any sign-in still waiting for the browser
+  // (e.g. the user closed the tab or picked the wrong account).
+  if (pendingSignIn) pendingSignIn('Started a new sign-in');
   const verifier = b64u(crypto.randomBytes(32)), challenge = b64u(crypto.createHash('sha256').update(verifier).digest()), state = b64u(crypto.randomBytes(16));
   const { code, redirect } = await new Promise((resolve, reject) => {
+    pendingSignIn = why => { try { srv.close(); } catch {} clearTimeout(to); pendingSignIn = null; reject(new Error(why || 'Sign-in was cancelled')); };
     const srv = http.createServer((req, res) => {
       const u = new URL(req.url, 'http://127.0.0.1');
       if (!u.searchParams.has('code') && !u.searchParams.has('error')) { res.writeHead(404); return res.end(); }
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
       res.end(`<!doctype html><meta charset="utf-8"><title>Quiet</title><body style="font:16px system-ui;background:#F6F5F1;color:#1E1E1B;display:grid;place-items:center;height:100vh;margin:0"><div style="text-align:center"><h2 style="font-family:Georgia,serif;font-weight:400">${u.searchParams.get('error') ? 'Sign-in was cancelled.' : 'You\'re connected.'}</h2><p>You can close this tab and go back to Quiet.</p></div>`);
-      srv.close(); clearTimeout(to);
+      srv.close(); clearTimeout(to); pendingSignIn = null;
       if (u.searchParams.get('state') !== state) return reject(new Error('Sign-in failed (state mismatch)'));
       if (u.searchParams.get('error')) return reject(new Error('Sign-in was cancelled'));
       resolve({ code: u.searchParams.get('code'), redirect: `http://127.0.0.1:${srv.address()?.port || port}` });
     });
     let port = 0;
-    const to = setTimeout(() => { srv.close(); reject(new Error('Sign-in timed out')); }, 5 * 60e3);
+    const to = setTimeout(() => { srv.close(); pendingSignIn = null; reject(new Error('Sign-in timed out — click Connect Google to try again')); }, 3 * 60e3);
     srv.listen(0, '127.0.0.1', () => {
       port = srv.address().port;
       const q = new URLSearchParams({ client_id: config.googleClientId, redirect_uri: `http://127.0.0.1:${port}`, response_type: 'code', scope: scopes, code_challenge: challenge, code_challenge_method: 'S256', state, access_type: 'offline', prompt: 'consent select_account' });

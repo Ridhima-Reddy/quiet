@@ -52,8 +52,10 @@ export async function getToken({ interactive = false, force = false } = {}) {
   if (!force && g?.token && g.exp > Date.now() + 90e3) return g.token;
   if (!interactive && !g?.connected) return null;
   if (!googleConfigured()) { if (interactive) throw new Error('Google sign-in is not set up yet — see the Google setup guide (Quiet docs › GOOGLE_SETUP.md)'); return null; }
-  if (inflight) return inflight;
-  inflight = (async () => {
+  // Background refreshes share one request; a click on "Connect Google" always starts a fresh sign-in
+  // (the old one may be stuck in a browser tab the user closed).
+  if (inflight && !interactive) return inflight;
+  const mine = inflight = (async () => {
     const first = !g?.connected, hint = g?.email;
     const r = isDesktop ? await desktopAuth(interactive, force) : isExt ? await extAuth(interactive, hint, first) : await webAuth(interactive, hint, first);
     if (!r) { if (g?.connected) await store.setLocal({ google: { ...store.local.google, token: null, needsTap: true } }); return null; }
@@ -65,7 +67,7 @@ export async function getToken({ interactive = false, force = false } = {}) {
     if (profile.name && !store.prefs().name) await store.setPref('name', profile.name.split(' ')[0]);
     return r.token;
   })();
-  try { return await inflight; } finally { inflight = null; }
+  try { return await mine; } finally { if (inflight === mine) inflight = null; }
 }
 
 export async function disconnect() {
