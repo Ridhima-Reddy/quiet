@@ -1,8 +1,10 @@
-# Hosts the phone/web app on GitHub Pages (HTTPS, free) whenever main is pushed.
-# Repo → Settings → Pages → Source: "GitHub Actions". The app will be at https://<user>.github.io/<repo>/
+# Hosts the phone/web app on GitHub Pages (HTTPS). Run it from the Actions tab.
+# Pages on a PRIVATE repo needs GitHub Pro (free for students via the GitHub Student Developer Pack).
+# Once Pages is available: Settings → Pages → Source: "GitHub Actions", then add
+#   push: { branches: [main] }
+# under `on:` to redeploy on every push. The app will be at https://<user>.github.io/<repo>/
 name: Deploy phone app
 on:
-  push: { branches: [main] }
   workflow_dispatch:
 permissions: { contents: read, pages: write, id-token: write }
 concurrency: { group: pages, cancel-in-progress: true }
