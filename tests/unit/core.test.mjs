@@ -50,6 +50,8 @@ reply to Prof Rao's email`, [{ id: 'g1', name: 'Get into a good masters program'
   assert.equal(r2.items[0].title, 'Submit SOP for ETH', 'numeric dates are removed from titles');
   assert.equal(r2.items[0].due, '2026-11-21');
   assert.ok(r2.items[1].effort <= 90, 'reading a paper is not a 4-hour task');
+  const r3 = offlineExtract('call dadi on sunday evening', [], T);
+  assert.equal(r3.items[0].title, 'Call dadi'); assert.equal(r3.items[0].start, '2026-11-15', 'done on Sunday, not before');
   const items = toItems(r, []);
   const prep = items.find(i => /prepare/i.test(i.title)), ev = items.find(i => i.kind === 'event');
   assert.equal(prep.prepFor, ev.id);

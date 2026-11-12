@@ -76,7 +76,8 @@ function cleanTitle(s) {
     .replace(/\b(on |by )?\d{1,2}(st|nd|rd|th)?\s+(of\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\b/gi, '')
     .replace(/\b(for )?\d+(\.\d+)?\s*(h|hr|hrs|hours?|m|mins?|minutes)\b/gi, '')
     .replace(/\b(by |on |before |due |till |until )?(the )?\d{1,2}[\/.]\d{1,2}([\/.]\d{2,4})?\b/gi, '').replace(/\b(by|on|before|due|till|until) the \d{1,2}(st|nd|rd|th)\b/gi, '')
-    .replace(/\s+(by|on|before|at|due)\s*$/i, '')
+    .replace(/\b(in the |this |tomorrow |on )?(morning|afternoon|evening|night)\b/gi, '')
+    .replace(/\s+(by|on|before|at|due|in the)\s*$/i, '')
     .replace(/\s{2,}/g, ' ').replace(/^[\s,;:-]+|[\s,;:-]+$/g, '').trim();
   return t ? t[0].toUpperCase() + t.slice(1) : '';
 }
@@ -104,7 +105,10 @@ export function offlineExtract(dump, goals, today = todayISO()) {
       continue;
     }
     const effort = dur || effortGuess(l);
-    items.push({ title, kind: 'task', due: date && date < today ? today : date, dueTime: time, hard: !!date && HARD_RX.test(l), effort, load: guessLoad(effort), goals: goalIds, src: 'dump' });
+    const due = date && date < today ? today : date;
+    // "call dadi on sunday" means do it ON Sunday, not "by" Sunday
+    const onDay = due && !HARD_RX.test(l) && /\bon\s+(mon|tue|wed|thu|fri|sat|sun)|\b(today|tonight|tomorrow)\s+(morning|afternoon|evening|night)\b/.test(l);
+    items.push({ title, kind: 'task', due, dueTime: time, hard: !!date && HARD_RX.test(l), start: onDay ? due : null, effort, load: guessLoad(effort), goals: goalIds, src: 'dump' });
   }
   return { items, concerns, habits };
 }
