@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy policy · Quiet</title>
+<link rel="icon" href="icons/icon-32.png">
+<style>
+:root{--bg:#F6F5F1;--ink:#1E1E1B;--muted:#5C5B56;--line:#E6E4DE;--accent:#4E7360}
+@media (prefers-color-scheme:dark){:root{--bg:#121211;--ink:#ECEBE6;--muted:#ABA9A1;--line:#2A2A27;--accent:#8DB89F}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 "Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif}
+main{max-width:720px;margin:0 auto;padding:56px 20px 80px}
+h1,h2{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;font-weight:400}
+h1{font-size:40px;margin:0 0 4px}h2{font-size:24px;margin:36px 0 8px}
+p,li{color:var(--muted)}strong{color:var(--ink)}a{color:var(--accent)}
+.brand{display:flex;align-items:center;gap:10px;font-family:"Palatino Linotype",Georgia,serif;font-size:22px;color:var(--ink);text-decoration:none;margin-bottom:32px}
+.brand img{width:32px;height:32px;border-radius:8px}
+hr{border:0;border-top:1px solid var(--line);margin:40px 0 16px}
+</style></head>
+<body><main>
+<a class="brand" href="./"><img src="icons/icon-48.png" alt="">quiet</a>
+<h1>Privacy policy</h1>
+<p>Last updated 12 November 2026</p>
+
+<p>Quiet is a student prototype: a calm planner that turns a “brain dump” into a realistic plan and reminds you to look after yourself. It is built so that <strong>your data stays with you</strong>. There is no Quiet server and no Quiet database.</p>
+
+<h2>What Quiet stores, and where</h2>
+<ul>
+<li><strong>On your device.</strong> Everything you add — tasks, events, notes, goals, habits, energy check-ins, focus sessions and “parked” thoughts — is saved in your browser’s or app’s local storage on that device.</li>
+<li><strong>In your own Google Drive (only if you connect Google).</strong> To keep your devices in sync, Quiet saves one file in a hidden, app-specific folder in your Google Drive (the <em>appDataFolder</em>). Quiet cannot see any of your other Drive files, and nobody else can see this one.</li>
+</ul>
+
+<h2>What Quiet does with your Google account</h2>
+<p>When you choose <strong>Connect Google</strong>, Quiet asks for:</p>
+<ul>
+<li><strong>Your name, email and profile picture</strong> — to show which account is connected and to greet you by name.</li>
+<li><strong>Google Drive app data</strong> (<code>drive.appdata</code>) — to read and write the single sync file described above.</li>
+<li><strong>Google Calendar events</strong> (<code>calendar.events</code>) — to read your events so meetings and classes count as busy time when Quiet plans your day, and to add, update or remove the events Quiet creates for you: exams, meetings, hard deadlines and tasks with a set time. Quiet never edits or deletes events it didn’t create.</li>
+</ul>
+<p>This information is used only to provide these features to you. Quiet’s use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. Your Google data is never sold, never used for advertising, never used to train AI models, and never sent to the people who made Quiet.</p>
+
+<h2>AI features (optional)</h2>
+<p>Quiet works without AI. If you add your own API key for an AI provider (Groq, Google Gemini, OpenAI or Anthropic), the text you type into the brain dump — and any file or photo you attach to it — is sent <strong>directly from your device to that provider</strong> to sort it into tasks or write your weekly reflection. That provider’s own privacy terms apply. Your key is stored on your devices and, if you connect Google, in your Drive sync file.</p>
+
+<h2>No tracking</h2>
+<p>Quiet has no analytics, no ads, no cookies for tracking and no third-party trackers. The app is hosted on Netlify, which may keep standard server logs (such as IP addresses) when the page is loaded.</p>
+
+<h2>Deleting your data</h2>
+<ul>
+<li>In Quiet, go to <strong>You → Your data → Erase this device</strong>.</li>
+<li>Go to <strong>You → Google → Disconnect</strong> to revoke Quiet’s access. You can also remove it at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</li>
+<li>To delete the sync file, open Google Drive → Settings → <strong>Manage apps</strong> → Quiet → <strong>Delete hidden app data</strong>.</li>
+<li>Events Quiet added to Google Calendar can be deleted there like any other event.</li>
+</ul>
+
+<h2>User studies</h2>
+<p>If you take part in a study of Quiet, the optional study mode records how well Quiet sorted your brain dumps, only on your device. Nothing is shared unless you choose to export it and hand it over.</p>
+
+<h2>Contact</h2>
+<p>Questions about privacy? Write to the support email shown on Google’s sign-in screen for Quiet.</p>
+<hr>
+<p><a href="./">Back to Quiet</a> · <a href="terms.html">Terms of use</a></p>
+</main></body></html>

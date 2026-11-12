@@ -1,6 +1,6 @@
 // Google Cloud OAuth client IDs. See Desktop › Quiet docs › GOOGLE_SETUP.md (about 10 minutes, free).
 // You can also paste the Web client ID in Quiet → You → Google → Advanced without rebuilding.
-export const GOOGLE_WEB_CLIENT_ID = '';
+export const GOOGLE_WEB_CLIENT_ID = '1075904311038-5dj6v9kapinteu3kq6ien66eir5p9icq.apps.googleusercontent.com';
 // Desktop app (Electron) uses a "Desktop app" OAuth client — set in desktop/config.json.
 
 export const SCOPES = [

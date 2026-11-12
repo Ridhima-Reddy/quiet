@@ -82,7 +82,7 @@ export function You() {
       <InstallSection />
 
       <section class="set-sec">
-        <h2>Your data</h2><p>Everything lives on your devices and, if you connect Google, in a private app folder in your own Drive. Nobody else can read it.</p>
+        <h2>Your data</h2><p>Everything lives on your devices and, if you connect Google, in a private app folder in your own Drive. Nobody else can read it. <a href={(WEB_APP_URL || './') + 'privacy.html'} target="_blank" rel="noreferrer">Privacy policy</a> · <a href={(WEB_APP_URL || './') + 'terms.html'} target="_blank" rel="noreferrer">Terms of use</a></p>
         <div class="row wrap">
           <button class="btn" onClick={() => { const data =JSON.parse(JSON.stringify(store.state)); delete data.prefs.aiKey; const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 1)], { type: 'application/json' })); a.download = `quiet-backup-${new Date().toISOString().slice(0, 10)}.json`; a.click(); }}><Icon name="down" size={15} />Export backup</button>
           <label class="btn"><Icon name="up" size={15} />Import backup<input type="file" accept="application/json" class="sr" onChange={async e => { const f = e.currentTarget.files[0]; if (!f) return; try { const { mergeStates } = await import('../../core/merge.js'); const d = JSON.parse(await f.text()); await store.replace(mergeStates(store.state, d), { dirty: true }); q.toast('Backup merged in.'); } catch (err) { q.toast('That file could not be read.'); } }} /></label>

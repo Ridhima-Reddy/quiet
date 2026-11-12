@@ -78,6 +78,7 @@ async function build() {
   }, null, 2));
   write(path.join(web, 'sw.js'), fs.readFileSync(R('src/static/sw.js'), 'utf8').replace('__VERSION__', VERSION + '-' + STAMP));
   write(path.join(web, '.nojekyll'), '');
+  for (const f of ['privacy.html', 'terms.html']) cp(R('src/static/' + f), path.join(web, f)); // linked from Google's consent screen
 
   // ---- Desktop (Electron loads these from a local server) ----
   const desk = R('desktop/app'); rm(desk); shared(desk);
